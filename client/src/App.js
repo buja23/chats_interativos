@@ -1,25 +1,17 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import RoomSelector from "./components/RoomSelector";
+import Room from "./components/Room";
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        {/* Tela inicial para escolher a sala */}
+        <Route path="/" element={<RoomSelector />} />
+
+        {/* Tela da sala */}
+        <Route path="/room/:room" element={<Room />} />
+      </Routes>
+    </Router>
   );
 }
-
-export default App;

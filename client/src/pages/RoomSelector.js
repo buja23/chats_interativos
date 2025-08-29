@@ -10,9 +10,9 @@ export default function RoomSelector() {
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
       <h2>Selecione uma sala de bate-papo</h2>
-      <button onClick={() => handleJoin("games")}>🎮 Jogos</button>
-      <button onClick={() => handleJoin("movies")}>🎬 Filmes</button>
-      <button onClick={() => handleJoin("music")}>🎵 Música</button>
+      <button onClick={() => handleJoin("Jogos")}>🎮 Jogos</button>
+      <button onClick={() => handleJoin("Filmes")}>🎬 Filmes</button>
+      <button onClick={() => handleJoin("Musica")}>🎵 Música</button>
     </div>
   );
 }

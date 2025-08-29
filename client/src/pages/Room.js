@@ -1,32 +1,37 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+
+
 
 const socket = io("http://localhost:3001");
 
 export default function Room() {
   const { roomId } = useParams();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [username, setUsername] = useState("");
 
   useEffect(() => {
-
-    // pergutar nome
+    // Pergunta o nome do usuário
     const name = prompt("Digite seu nome:") || "Anônimo";
     setUsername(name);
 
-    //entra na sala
+    // Entra na sala
     socket.emit("joinRoom", { room: roomId, username: name });
 
-    // recebe as mensagens
-    socket.on("receiveMessage", (data) => {
+    // Recebe as mensagens
+    const handleMessage = (data) => {
       setMessages((prev) => [...prev, data]);
-    });
+    };
 
+    socket.on("receiveMessage", handleMessage);
+
+    // Cleanup ao sair do componente
     return () => {
-      // sair da sala
-      socket.off("receiveMessage");
+      socket.off("receiveMessage", handleMessage);
+      socket.emit("leaveRoom", { room: roomId, username: name });
     };
   }, [roomId]);
 
@@ -40,6 +45,14 @@ export default function Room() {
       setInput("");
     }
   };
+
+  const handleLeave = () => {
+    socket.emit("leaveRoom", { room: roomId, username });
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 100);
+  };
+
 
   return (
     <div style={{ padding: "20px" }}>
@@ -58,6 +71,7 @@ export default function Room() {
             <b>{msg.user}:</b> {msg.message}
           </p>
         ))}
+        
       </div>
       <input
         value={input}
@@ -66,6 +80,9 @@ export default function Room() {
         placeholder="Digite sua mensagem..."
       />
       <button onClick={sendMessage}>Enviar</button>
+      <div style={{ marginTop: "10px" }}>
+        <button onClick={handleLeave}>Sair da sala</button>
+      </div>
     </div>
   );
 }

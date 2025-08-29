@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import RoomSelector from "./components/RoomSelector";
-import Room from "./components/Room";
+import RoomSelector from "./pages/RoomSelector";
+import Room from "./pages/Room";
+import './styles.css'; 
+
+
 
 function App() {
   return (

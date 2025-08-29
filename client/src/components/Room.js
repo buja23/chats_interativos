@@ -5,49 +5,64 @@ import { io } from "socket.io-client";
 const socket = io("http://localhost:3001");
 
 export default function Room() {
-  const { room } = useParams();
-  const [username, setUsername] = useState("");
-  const [input, setInput] = useState("");
+  const { roomId } = useParams();
   const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
-    // pedir o nome do usuário ao entrar
+
+    // pergutar nome
     const name = prompt("Digite seu nome:") || "Anônimo";
     setUsername(name);
 
-    socket.emit("joinRoom", room);
+    //entra na sala
+    socket.emit("joinRoom", { room: roomId, username: name });
 
+    // recebe as mensagens
     socket.on("receiveMessage", (data) => {
       setMessages((prev) => [...prev, data]);
     });
 
     return () => {
-      socket.disconnect();
+      // sair da sala
+      socket.off("receiveMessage");
     };
-  }, [room]);
+  }, [roomId]);
 
   const sendMessage = () => {
     if (input.trim() !== "") {
-      const data = { user: username, text: input, room };
-      socket.emit("sendMessage", data);
+      socket.emit("sendMessage", {
+        room: roomId,
+        user: username,
+        message: input,
+      });
       setInput("");
     }
   };
 
   return (
-    <div>
-      <h2>Sala: {room}</h2>
-      <div style={{ border: "1px solid #ccc", height: "300px", overflowY: "auto", padding: "10px" }}>
+    <div style={{ padding: "20px" }}>
+      <h2>Sala: {roomId}</h2>
+      <div
+        style={{
+          border: "1px solid #ccc",
+          padding: "10px",
+          height: "300px",
+          overflowY: "auto",
+          marginBottom: "10px",
+        }}
+      >
         {messages.map((msg, i) => (
           <p key={i}>
-            <strong>{msg.user}:</strong> {msg.text}
+            <b>{msg.user}:</b> {msg.message}
           </p>
         ))}
       </div>
-
       <input
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && sendMessage()}
         placeholder="Digite sua mensagem..."
       />
       <button onClick={sendMessage}>Enviar</button>
